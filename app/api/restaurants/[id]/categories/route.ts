@@ -1,20 +1,17 @@
 import { NextResponse } from "next/server";
-import { storage } from "@/lib/storage"; // Adjust path if needed
+import { storage } from "@/lib/storage";
 
-// FIX: Add Promise type
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> } // 1. Change type to Promise
 ) {
-  // FIX: Await params
-  const { id } = await params;
+  const { id } = await params; // 2. Await the params
 
-  // Use the correct method to get menu categories by restaurant ID
   const categories = await storage.getMenuCategories(id);
-
+  
   if (!categories) {
     return NextResponse.json({ error: "Categories not found" }, { status: 404 });
   }
-
+  
   return NextResponse.json(categories);
 }

@@ -162,7 +162,8 @@ export default function RestaurantClient({ id }: { id: string }) {
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
             <span className="text-6xl font-bold text-primary/30">
-              {restaurant.name.charAt(0)}
+            {/* usage of ?. ensures it doesn't crash if name is undefined */}
+            {restaurant?.name?.charAt(0) || "F"}
             </span>
           </div>
         )}

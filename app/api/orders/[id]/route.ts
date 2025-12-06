@@ -3,20 +3,43 @@ import { storage } from "@/lib/storage";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const order = await storage.getOrder(params.id);
+  const { id } = await params;
+  const order = await storage.getOrder(id);
+  
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
   const restaurant = await storage.getRestaurant(order.restaurantId);
+  
+  // NEW: Fetch customer address to get delivery coordinates
+  let deliveryCoordinates = null;
+  if (order.addressId) {
+    const address = await storage.getAddress(order.addressId);
+    if (address && address.latitude && address.longitude) {
+      deliveryCoordinates = { 
+        lat: Number(address.latitude), 
+        lng: Number(address.longitude) 
+      };
+    }
+  }
 
   return NextResponse.json({
     ...order,
     restaurant: restaurant
-      ? { name: restaurant.name, imageUrl: restaurant.imageUrl }
+      ? { 
+          name: restaurant.name, 
+          imageUrl: restaurant.imageUrl,
+          // Pass restaurant coordinates
+          location: {
+            lat: Number(restaurant.latitude),
+            lng: Number(restaurant.longitude)
+          }
+        }
       : undefined,
+    deliveryCoordinates, // Pass customer coordinates
   });
 }
 

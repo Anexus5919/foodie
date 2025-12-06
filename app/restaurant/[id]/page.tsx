@@ -14,12 +14,12 @@ export async function generateMetadata({
   
   if (!restaurant) {
     return {
-      title: "Restaurant Not Found | FoodSwift",
+      title: "Restaurant Not Found | Foodie",
     };
   }
 
   return {
-    title: `${restaurant.name} | FoodSwift`,
+    title: `${restaurant.name} | Foodie`,
     description: `Order food online from ${restaurant.name} in ${restaurant.address}. View menu, reviews, and offers.`,
     openGraph: {
       images: [restaurant.imageUrl || ""],
