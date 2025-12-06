@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Correct router for Next.js
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useLocation } from "@/lib/store"; // IMPT: This hook provides the 'location' object
-import { Search, MapPin, ChevronRight, Clock, Star, Truck } from "lucide-react";
+import { Search, Clock, Star, Truck } from "lucide-react";
 
-const heroImage = "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1920&q=80";
+const heroImage =
+  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1920&q=80";
 
 const trustStats = [
   { icon: Star, value: "4.8", label: "Avg Rating" },
@@ -29,10 +29,6 @@ const popularCuisines = [
 
 export function HeroSection() {
   const router = useRouter();
-  
-  // FIX: This const declaration is required to define 'location'
-  const { location, requestLocation, isLoading } = useLocation(); 
-  
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
@@ -47,7 +43,12 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[70vh] flex items-center" data-testid="hero-section">
+    // FIX: Changed 'h-[80vh]' to 'h-auto' and added 'pb-20'.
+    // This allows the background to stretch if the content gets pushed down.
+    <section
+      className="relative h-[91vh] h-auto flex items-center pb-20"
+      data-testid="hero-section"
+    >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
@@ -55,65 +56,59 @@ export function HeroSection() {
           alt="Delicious food spread"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-2xl">
-          {/* Location */}
-          <button
-            onClick={requestLocation}
-            disabled={isLoading}
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
-            data-testid="hero-location-button"
-          >
-            <MapPin className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">
-              {/* Uses the location variable defined above */}
-              {location?.area || "Select Location"}, {location?.city || ""}
-            </span>
-            <ChevronRight className="h-4 w-4" />
-          </button>
-
-          {/* Heading */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-            Hungry? We've got you covered
+      {/* Content Container */}
+      <div className="w-full px-4 md:px-20 relative z-10">
+        <div className="max-w-2xl pt-24">
+          {/* Main Heading */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight tracking-tight">
+            Hungry? We've got <br />
+            <span className="text-orange-500">you covered</span>
           </h1>
-          
-          <p className="text-lg md:text-xl text-white/80 mb-8 max-w-lg">
-            Order food from your favorite restaurants and get it delivered to your doorstep in minutes.
+
+          <p className="text-xl text-gray-300 mb-8 max-w-lg font-medium">
+            Order food from your favorite restaurants and get it delivered to
+            your doorstep in minutes.
           </p>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="flex gap-2 mb-8">
-            <div className="relative flex-1 max-w-lg">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <form
+            onSubmit={handleSearch}
+            className="flex gap-2 mb-10 shadow-2xl rounded-xl bg-white/5 p-1 backdrop-blur-sm border border-white/10 max-w-lg"
+          >
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
                 type="search"
-                placeholder="Search for restaurants or dishes..."
+                placeholder="Search restaurants or dishes..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 pl-12 pr-4 text-base bg-background/95 backdrop-blur border-0 shadow-lg"
-                data-testid="hero-search-input"
+                className="h-12 pl-12 pr-4 text-base bg-white border-0 text-black placeholder:text-gray-500 rounded-lg focus-visible:ring-0"
               />
             </div>
-            <Button type="submit" size="lg" className="h-14 px-8" data-testid="hero-search-button">
+            <Button
+              type="submit"
+              size="lg"
+              className="h-12 px-8 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg"
+            >
               Search
             </Button>
           </form>
 
           {/* Popular Cuisines */}
-          <div className="mb-8">
-            <p className="text-white/60 text-sm mb-3">Popular:</p>
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-10">
+            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-3">
+              Popular Cuisines
+            </p>
+            <div className="flex flex-wrap gap-3">
               {popularCuisines.map((cuisine) => (
                 <Badge
                   key={cuisine}
                   variant="outline"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 cursor-pointer px-4 py-1.5"
+                  className="bg-white/5 border-white/20 text-gray-200 hover:bg-white/10 hover:border-white/40 cursor-pointer px-4 py-2 transition-all font-normal text-sm"
                   onClick={() => handleCuisineClick(cuisine)}
-                  data-testid={`cuisine-badge-${cuisine.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   {cuisine}
                 </Badge>
@@ -121,30 +116,20 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Trust Stats */}
-          <div className="flex flex-wrap gap-6 md:gap-10">
+          {/* Stats Divider */}
+          <div className="flex items-center gap-10 pt-6 border-t border-white/10">
             {trustStats.map((stat) => (
-              <div key={stat.label} className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
-                  <stat.icon className="h-6 w-6 text-primary" />
+              <div key={stat.label}>
+                <div className="flex items-center gap-2 mb-1">
+                  <stat.icon className="h-5 w-5 text-orange-500" />
+                  <span className="text-2xl font-bold text-white">
+                    {stat.value}
+                  </span>
                 </div>
-                <div>
-                  <p className="text-xl font-bold text-white">{stat.value}</p>
-                  <p className="text-sm text-white/60">{stat.label}</p>
-                </div>
+                <span className="text-sm text-gray-400">{stat.label}</span>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Promotional Banner */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-primary to-orange-500 py-3 z-10">
-        <div className="container mx-auto px-4">
-          <p className="text-center text-white font-medium">
-            Get 50% OFF on your first order! Use code:{" "}
-            <span className="font-bold bg-white/20 px-2 py-0.5 rounded">FIRST50</span>
-          </p>
         </div>
       </div>
     </section>

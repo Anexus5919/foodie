@@ -183,7 +183,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const requestLocation = useCallback(async () => {
-    // 1. Check if browser supports geolocation
     if (typeof window === 'undefined' || !navigator.geolocation) {
        console.warn("Geolocation not supported by this browser.");
        return;
@@ -193,14 +192,15 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: false,
-          timeout: 15000, // 10 seconds timeout
+          enableHighAccuracy: true, // <--- CHANGED: Set to true for GPS
+          timeout: 20000,           // <--- CHANGED: Increased timeout for GPS lock
+          maximumAge: 0             // <--- CHANGED: Do not use cached position
         });
       });
 
       const { latitude, longitude } = position.coords;
       
-      // Reverse geocode using Nominatim (free)
+      // Reverse geocode using Nominatim
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
@@ -215,7 +215,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           fullAddress: data.display_name || "",
         });
       } catch (geocodeError) {
-        // Fallback if API fails but GPS worked
         setLocationState({
           latitude,
           longitude,
@@ -225,15 +224,12 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         });
       }
     } catch (error: any) {
-      // 2. IMPROVED ERROR LOGGING
-      // Geolocation errors are objects, not strings. We need to log specific properties.
       if (error.code === 1) console.error("Location Error: Permission Denied");
       else if (error.code === 2) console.error("Location Error: Position Unavailable");
       else if (error.code === 3) console.error("Location Error: Timeout");
       else console.error("Location Error:", error);
 
-      // 3. SET FALLBACK LOCATION (Crucial to un-stuck the loading screen)
-      // Use default location (Bangalore)
+      // Fallback
       setLocationState({
         latitude: 12.9716,
         longitude: 77.5946,
@@ -242,7 +238,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         fullAddress: "Koramangala, Bangalore, Karnataka (Fallback)",
       });
     } finally {
-      // 4. STOP LOADING
       setIsLoading(false);
     }
   }, []);
