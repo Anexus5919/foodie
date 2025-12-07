@@ -3,9 +3,10 @@ import { storage } from "../../../../lib/storage";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const dish = await storage.getDish(params.id);
+  const { id } = await params;
+  const dish = await storage.getDish(id);
   if (!dish) {
     return NextResponse.json({ error: "Dish not found" }, { status: 404 });
   }
@@ -14,10 +15,11 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const body = await request.json();
-  const updated = await storage.updateDish(params.id, body);
+  const updated = await storage.updateDish(id, body);
   if (!updated) {
     return NextResponse.json({ error: "Dish not found" }, { status: 404 });
   }

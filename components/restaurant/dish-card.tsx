@@ -13,7 +13,7 @@ import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { Separator } from "../../components/ui/separator";
 import { ScrollArea } from "../../components/ui/scroll-area";
-import { useCart, useAuth } from "../../lib/store";
+import { useCart } from "../../lib/store";
 import { useToast } from "../../hooks/use-toast";
 import type { Dish, Restaurant, SelectedCustomization, DishCustomization } from "../../shared/schema";
 import { Star, Plus, Minus, Flame, Award, Sparkles, Heart } from "lucide-react";
@@ -193,7 +193,7 @@ export function DishCard({ dish, restaurant }: DishCardProps) {
               )}
               {dish.isChefSpecial && (
                 <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                  Chef's Special
+                  Chef&rsquo;s Special
                 </Badge>
               )}
               {dish.isHealthy && (

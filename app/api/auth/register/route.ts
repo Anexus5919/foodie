@@ -3,7 +3,11 @@ import { storage } from "../../../../lib/storage";
 
 export async function POST(request: Request) {
   try {
-    const { email, name, role } = await request.json();
+    const { email, name, role } = (await request.json()) as {
+      email: string;
+      name: string;
+      role?: string;
+    };
 
     const existing = await storage.getUserByEmail(email);
     if (existing) {
@@ -13,17 +17,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // 🎉 FIX: explicitly type this object as ANY so TS stops inferring NEVER
-    const userData: any = {
-      email: email,
-      name: name,
-      phone: null,
+    const user = await storage.createUser({
+      email,
+      name,
       role: role || "customer",
-      avatarUrl: null,
-      firebaseUid: null,
-    };
-
-    const user = await storage.createUser(userData);
+    } as unknown as Parameters<typeof storage.createUser>[0]);
 
     return NextResponse.json(user);
   } catch (error) {

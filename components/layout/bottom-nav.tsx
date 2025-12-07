@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, Package, User } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useAuth } from "../../lib/store";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
@@ -15,7 +14,6 @@ const navItems = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { isAuthenticated } = useAuth();
 
   // Don't show on restaurant or delivery partner dashboards
   // Ensure pathname is not null before checking

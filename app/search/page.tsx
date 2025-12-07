@@ -1,5 +1,7 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import SearchClient from "./client";
+import { Skeleton } from "../../components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Search | Foodie",
@@ -7,5 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function SearchPage() {
-  return <SearchClient />;
+  return (
+    <Suspense fallback={<div className="container py-8"><Skeleton className="h-96" /></div>}>
+      <SearchClient />
+    </Suspense>
+  );
 }

@@ -5,7 +5,7 @@ export default function CookiesPage() {
         <div className="space-y-4 text-muted-foreground">
           <p>This Cookie Policy explains what Cookies are and how We use them.</p>
           <h2 className="text-xl font-semibold text-foreground mt-6">Type of Cookies We Use</h2>
-          <p>Cookies can be "Persistent" or "Session" Cookies. Persistent Cookies remain on your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close your web browser.</p>
+          <p>Cookies can be &ldquo;Persistent&rdquo; or &ldquo;Session&rdquo; Cookies. Persistent Cookies remain on your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close your web browser.</p>
           <p>We use both Session and Persistent Cookies for the purposes set out below...</p>
         </div>
       </div>

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth, useTheme } from "../../lib/store";
+import { useAuth } from "../../lib/store";
+import { useTheme } from "../../lib/store";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "../../lib/queryClient";
 import { Button } from "../../components/ui/button";
@@ -14,13 +15,13 @@ import { Separator } from "../../components/ui/separator";
 import { useToast } from "../../hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { Textarea } from "../../components/ui/textarea";
-import { User, MapPin, Phone, Mail, LogOut, Trash2, Plus, Moon, Sun, Loader2 } from "lucide-react";
+import { MapPin, Phone, Mail, LogOut, Trash2, Plus, Moon, Sun, Loader2 } from "lucide-react";
 import type { Address } from "../../shared/schema";
 
 export default function ProfileClient() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading, setUser } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -72,7 +73,13 @@ export default function ProfileClient() {
     <div className="container mx-auto px-4 py-8 max-w-4xl min-h-screen">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">My Profile</h1>
-        <Button variant="ghost" size="icon" onClick={toggleTheme}>{theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}</Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+        >
+          {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+        </Button>
       </div>
 
       <div className="grid gap-8 md:grid-cols-3">

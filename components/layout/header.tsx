@@ -57,6 +57,11 @@ export function Header() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,15 +81,16 @@ export function Header() {
   const isHomePage = pathname === "/";
   const isTransparent = isHomePage && !scrolled;
 
+  // Use default "light" theme colors on server; actual theme applies after mount
   const textColorClass =
-    theme === "light"
+    !mounted || theme === "light"
       ? "text-black"
       : isTransparent
       ? "text-white"
       : "text-foreground";
 
   const iconColorClass =
-    theme === "light"
+    !mounted || theme === "light"
       ? "text-black"
       : isTransparent
       ? "text-white"
@@ -213,7 +219,7 @@ export function Header() {
                       textColorClass
                     )}
                   >
-                    {userLocation.area || "Setup your location"}
+                    {mounted ? (userLocation.area || "Setup your location") : "Select Location"}
                   </span>
                   <ChevronDown className="h-4 w-4 text-orange-500" />
                 </div>
@@ -239,14 +245,16 @@ export function Header() {
             {/* RIGHT ACTION BUTTONS */}
             <div className="flex items-center gap-6">
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                className={cn(hoverClass, iconColorClass)}
-              >
-                {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-              </Button>
+              {mounted && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className={cn(hoverClass, iconColorClass)}
+                >
+                  {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                </Button>
+              )}
 
               <Button
                 variant="ghost"
@@ -262,35 +270,37 @@ export function Header() {
                 )}
               </Button>
 
-              {isAuthenticated ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className={cn("hidden sm:flex items-center gap-2 font-medium", hoverClass, textColorClass)}
-                    >
-                      <User className="h-5 w-5" />
-                      <span className="max-w-24 truncate">{user?.name}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 mt-2">
-                    <DropdownMenuItem asChild>
-                      <Link href="/orders">My Orders</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile">Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive">Sign Out</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button
-                  onClick={() => setIsAuthOpen(true)}
-                  className="hidden sm:flex px-8 font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl h-10 border-none"
-                >
-                  Sign in
-                </Button>
+              {mounted && (
+                isAuthenticated ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className={cn("hidden sm:flex items-center gap-2 font-medium", hoverClass, textColorClass)}
+                      >
+                        <User className="h-5 w-5" />
+                        <span className="max-w-24 truncate">{user?.name}</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 mt-2">
+                      <DropdownMenuItem asChild>
+                        <Link href="/orders">My Orders</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile">Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-destructive">Sign Out</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button
+                    onClick={() => setIsAuthOpen(true)}
+                    className="hidden sm:flex px-8 font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl h-10 border-none"
+                  >
+                    Sign in
+                  </Button>
+                )
               )}
 
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>

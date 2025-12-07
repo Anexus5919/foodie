@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { storage } from "../../../lib/storage";
+import { storage } from "../../../../../lib/storage";
 
 export async function POST(
   request: Request,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
+  const { orderId } = await params;
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
   
@@ -14,7 +15,7 @@ export async function POST(
      return NextResponse.json({ error: "User ID required" }, { status: 400 });
   }
 
-  const order = await storage.updateOrder(params.orderId, {
+  const order = await storage.updateOrder(orderId, {
     deliveryPartnerId: userId,
     status: "picked_up",
   });

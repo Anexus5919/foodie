@@ -74,7 +74,7 @@ export function DeliveryMap({
         map.current = null;
       }
     };
-  }, []);
+  }, [center.lat, center.lng]);
 
   // Update Markers
   useEffect(() => {
@@ -109,7 +109,7 @@ export function DeliveryMap({
         .setLngLat([deliveryLocation.lng, deliveryLocation.lat])
         .addTo(map.current);
     }
-  }, [mapLoaded, restaurantLocation, deliveryLocation]);
+  }, [mapLoaded, restaurantLocation?.lat, restaurantLocation?.lng, deliveryLocation?.lat, deliveryLocation?.lng]);
 
   // Update Partner Marker (Live Tracking)
   useEffect(() => {
@@ -134,7 +134,7 @@ export function DeliveryMap({
       center: [partnerLocation.lng, partnerLocation.lat],
       speed: 0.5,
     });
-  }, [mapLoaded, partnerLocation]);
+  }, [mapLoaded, partnerLocation.lat, partnerLocation.lng]);
 
   // Fit bounds
   useEffect(() => {
@@ -149,7 +149,7 @@ export function DeliveryMap({
     if (count > 0) {
       map.current.fitBounds(bounds, { padding: 80, maxZoom: 15 });
     }
-  }, [mapLoaded, restaurantLocation, deliveryLocation]);
+  }, [mapLoaded, restaurantLocation?.lat, restaurantLocation?.lng, deliveryLocation?.lat, deliveryLocation?.lng]);
 
   return <div ref={mapContainer} className={`w-full h-full ${className}`} />;
 }

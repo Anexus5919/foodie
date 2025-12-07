@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
-import { X, Send, Sparkles, Loader2, Trash2, Bot, User } from "lucide-react";
+import { X, Send, Sparkles, Trash2, Bot, User } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 

@@ -11,12 +11,9 @@ import {
   type InsertOrder,
   type Address,
   type InsertAddress,
-  type CartItem,
-  type InsertCartItem,
   type DeliveryPartner,
   type InsertDeliveryPartner,
   type Coupon,
-  type InsertCoupon,
   type DishReview,
   type InsertDishReview,
 } from "../shared/schema";
@@ -27,7 +24,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByFirebaseUid(uid: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createUser(user: Partial<InsertUser> & { email: string; name: string }): Promise<User>;
   updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
 
   // Restaurants
@@ -106,7 +103,7 @@ export class MemStorage implements IStorage {
     const TIME_TO_PICKUP = 60;
     const TIME_TO_DELIVER = 120; // 2 minutes total for demo purposes
 
-    let updated = { ...order };
+    const updated = { ...order };
     let changed = false;
 
     // 1. Advance Status

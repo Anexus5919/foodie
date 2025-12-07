@@ -112,8 +112,8 @@ type ChartTooltipContentProps = React.ComponentProps<typeof RechartsPrimitive.To
     labelKey?: string
     // Explicitly add these internal props that Recharts injects
     active?: boolean
-    payload?: any[]
-    label?: any
+    payload?: Record<string, unknown>[]
+    label?: string | number
   }
 
 const ChartTooltipContent = React.forwardRef<
@@ -192,21 +192,22 @@ const ChartTooltipContent = React.forwardRef<
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
-          {payload.map((item: any, index: number) => {
-            const key = `${nameKey || item.name || item.dataKey || "value"}`
+          {payload.map((item: Record<string, unknown>, index: number) => {
+            const itemTyped = item as Record<string, unknown> & { dataKey?: unknown; name?: unknown; value?: unknown; payload?: unknown };
+            const key = `${nameKey || itemTyped.name || itemTyped.dataKey || "value"}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
-            const indicatorColor = color || item.payload?.fill || item.color
+            const indicatorColor = color || (itemTyped.payload as Record<string, unknown> | undefined)?.fill || itemTyped.color
 
             return (
               <div
-                key={item.dataKey}
+                key={String(itemTyped.dataKey)}
                 className={cn(
                   "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
                   indicator === "dot" && "items-center"
                 )}
               >
-                {formatter && item?.value !== undefined && item.name ? (
-                  formatter(item.value, item.name, item, index, item.payload)
+                {formatter && itemTyped?.value !== undefined && itemTyped.name ? (
+                  formatter(itemTyped.value as unknown as Parameters<typeof formatter>[0], String(itemTyped.name), item, index, (itemTyped.payload || []) as Parameters<typeof formatter>[4])
                 ) : (
                   <>
                     {itemConfig?.icon ? (
@@ -242,12 +243,12 @@ const ChartTooltipContent = React.forwardRef<
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
                         <span className="text-muted-foreground">
-                          {itemConfig?.label || item.name}
+                          {itemConfig?.label || String(itemTyped.name)}
                         </span>
                       </div>
-                      {item.value && (
+                      {itemTyped.value && (
                         <span className="font-mono font-medium tabular-nums text-foreground">
-                          {item.value.toLocaleString()}
+                          {String(itemTyped.value).toLocaleString()}
                         </span>
                       )}
                     </div>
@@ -270,7 +271,7 @@ type ChartLegendContentProps = React.ComponentProps<"div"> & {
   hideIcon?: boolean
   nameKey?: string
   verticalAlign?: "top" | "middle" | "bottom"
-  payload?: any[]
+  payload?: Record<string, unknown>[]
 }
 
 const ChartLegendContent = React.forwardRef<
@@ -296,13 +297,13 @@ const ChartLegendContent = React.forwardRef<
           className
         )}
       >
-        {payload.map((item: any) => {
+        {payload.map((item: Record<string, unknown>) => {
           const key = `${nameKey || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
           return (
             <div
-              key={item.value}
+              key={String(item.value)}
               className={cn(
                 "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
               )}
@@ -313,7 +314,7 @@ const ChartLegendContent = React.forwardRef<
                 <div
                   className="h-2 w-2 shrink-0 rounded-[2px]"
                   style={{
-                    backgroundColor: item.color,
+                    backgroundColor: String(item.color),
                   }}
                 />
               )}

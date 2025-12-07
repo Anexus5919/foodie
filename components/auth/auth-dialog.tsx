@@ -103,10 +103,11 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         description: `Signed in as ${user.name}`,
       });
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMsg = error instanceof Error ? error.message : "Please check your credentials and try again";
       toast({
         title: mode === "signup" ? "Registration failed" : "Login failed",
-        description: error.message || "Please check your credentials and try again",
+        description: errorMsg,
         variant: "destructive",
       });
     } finally {
@@ -277,7 +278,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
             {mode === "login" ? (
               <p className="text-center text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                Don&rsquo;t have an account?{" "}
                 <button
                   onClick={() => setMode("signup")}
                   className="text-primary font-medium hover:underline"

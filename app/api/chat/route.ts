@@ -64,10 +64,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ reply: text });
 
-  } catch (error: any) {
-    console.error("🔥 GEMINI API ERROR:", error.message || error);
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error("🔥 GEMINI API ERROR:", errorMsg);
     
-    if (error.message?.includes("404")) {
+    if (errorMsg?.includes("404")) {
         console.error("⚠️ Model version error. Try switching 'gemini-2.5-flash' to 'gemini-2.0-flash'.");
     }
 

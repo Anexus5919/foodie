@@ -121,24 +121,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
 // Auth Provider
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-
-  useEffect(() => {
-    // Check for stored user session
+  const [user, setUser] = useState<User | null>(() => {
+    // Initialize state from localStorage during initial render
     if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem("foodie_user");
       if (storedUser) {
         try {
-          setUser(JSON.parse(storedUser));
-        } catch (e) {
+          return JSON.parse(storedUser);
+        } catch {
           localStorage.removeItem("foodie_user");
         }
       }
     }
-    setIsLoading(false);
-  }, []);
+    return null;
+  });
+  const [isLoading] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+
+
 
   const handleSetUser = useCallback((newUser: User | null) => {
     setUser(newUser);
@@ -214,7 +214,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           area: data.address?.suburb || data.address?.neighbourhood || data.address?.road || "Current Location",
           fullAddress: data.display_name || "",
         });
-      } catch (geocodeError) {
+      } catch {
         setLocationState({
           latitude,
           longitude,
@@ -223,10 +223,11 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           fullAddress: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
         });
       }
-    } catch (error: any) {
-      if (error.code === 1) console.error("Location Error: Permission Denied");
-      else if (error.code === 2) console.error("Location Error: Position Unavailable");
-      else if (error.code === 3) console.error("Location Error: Timeout");
+    } catch (error: unknown) {
+      const err = error as GeolocationPositionError | Error;
+      if ('code' in err && err.code === 1) console.error("Location Error: Permission Denied");
+      else if ('code' in err && err.code === 2) console.error("Location Error: Position Unavailable");
+      else if ('code' in err && err.code === 3) console.error("Location Error: Timeout");
       else console.error("Location Error:", error);
 
       // Fallback
@@ -253,25 +254,28 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
 // Theme Provider
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<"light" | "dark">("light");
+  const [theme, setThemeState] = useState<"light" | "dark">(() => {
+    // Initialize theme from localStorage or system preference
+    if (typeof window === "undefined") return "light";
+    const stored = localStorage.getItem("foodie_theme") as "light" | "dark" | null;
+    if (stored) return stored;
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+    return "light";
+  });
+  const [mounted, setMounted] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("foodie_theme") as "light" | "dark";
-      if (stored) {
-        setThemeState(stored);
-      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        setThemeState("dark");
-      }
-    }
+    setMounted(true);
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     const root = document.documentElement;
     root.classList.remove("light", "dark");
     root.classList.add(theme);
     localStorage.setItem("foodie_theme", theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
   const toggleTheme = useCallback(() => {
     setThemeState((prev) => (prev === "light" ? "dark" : "light"));

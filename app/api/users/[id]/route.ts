@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { storage } from "../../lib/storage";
+import { storage } from "../../../../lib/storage";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await storage.getUser(params.id);
+  const { id } = await params;
+  const user = await storage.getUser(id);
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
@@ -14,10 +15,11 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const body = await request.json();
-  const updated = await storage.updateUser(params.id, body);
+  const updated = await storage.updateUser(id, body);
   if (!updated) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }

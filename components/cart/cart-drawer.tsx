@@ -34,7 +34,7 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
-  const { cart, updateQuantity, removeItem, clearCart, getTotal, itemCount } = useCart();
+  const { cart, updateQuantity, clearCart, getTotal, itemCount } = useCart();
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [discount, setDiscount] = useState(0);
@@ -103,7 +103,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             </div>
             <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
             <p className="text-muted-foreground mb-6 max-w-xs">
-              Looks like you haven't added anything to your cart yet. Browse restaurants and add some delicious food!
+              Looks like you haven&rsquo;t added anything to your cart yet. Browse restaurants and add some delicious food!
             </p>
             <Button onClick={() => onOpenChange(false)} data-testid="button-browse-restaurants">
               Browse Restaurants
@@ -188,7 +188,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                   {/* Special Instructions */}
                   {item.specialInstructions && (
                     <p className="text-xs text-muted-foreground mt-0.5 italic">
-                      "{item.specialInstructions}"
+                      &ldquo;{item.specialInstructions}&rdquo;
                     </p>
                   )}
 

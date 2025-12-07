@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../lib/store";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +16,18 @@ import Link from "next/link";
 interface OrderWithDetails extends Order {
   restaurant?: { name: string; imageUrl?: string | null };
 }
+
+const EmptyState = ({ message }: { message: string }) => (
+  <div className="flex flex-col items-center justify-center py-12 text-center">
+    <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+      <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+    </div>
+    <h3 className="text-lg font-semibold">{message}</h3>
+    <Button variant="outline" asChild className="mt-2">
+      <Link href="/">Browse Restaurants</Link>
+    </Button>
+  </div>
+);
 
 export default function OrdersClient() {
   const router = useRouter();
@@ -71,18 +83,6 @@ const { data: orders = [], isLoading } = useQuery<OrderWithDetails[]>({
   );
   const deliveredOrders = orders.filter((o) => o.status === "delivered");
   const cancelledOrders = orders.filter((o) => o.status === "cancelled");
-
-  const EmptyState = ({ message }: { message: string }) => (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-        <ShoppingBag className="h-8 w-8 text-muted-foreground" />
-      </div>
-      <h3 className="text-lg font-semibold">{message}</h3>
-      <Button variant="outline" asChild className="mt-2">
-        <Link href="/">Browse Restaurants</Link>
-      </Button>
-    </div>
-  );
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl min-h-screen">

@@ -3,7 +3,10 @@ import { storage } from "../../../../lib/storage";
 
 export async function POST(request: Request) {
   try {
-    const { firebaseUid, email, name, avatarUrl } = await request.json();
+    const { firebaseUid, email } = (await request.json()) as {
+      firebaseUid: string;
+      email: string;
+    };
 
     // Check if user exists
     let user = await storage.getUserByFirebaseUid(firebaseUid);
@@ -17,16 +20,10 @@ export async function POST(request: Request) {
         user = await storage.updateUser(user.id, { firebaseUid });
       } else {
         // Create new user
-        type User = {
-          id: string;
-          name?: string;
-          email?: string;
-          phone?: string | null;
-          role?: string | null;
-          avatarUrl?: string | null;
-          firebaseUid?: string | null;
-        };
-        
+        user = await storage.createUser({
+          email,
+          name: email.split("@")[0], // Use email prefix as name
+        } as unknown as Parameters<typeof storage.createUser>[0]);
       }
     }
 

@@ -3,9 +3,10 @@ import { storage } from "../../../../lib/storage";
 
 export async function GET(
   request: Request,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
-  const coupon = await storage.getCoupon(params.code);
+  const { code } = await params;
+  const coupon = await storage.getCoupon(code);
   if (!coupon) {
     return NextResponse.json({ error: "Coupon not found" }, { status: 404 });
   }

@@ -20,7 +20,7 @@ export default function NotFound() {
         </h1>
         <h2 className="text-2xl md:text-3xl font-bold">Page Not Cooked Yet</h2>
         <p className="text-muted-foreground text-lg">
-          The page you are looking for is either under construction, moved to a new location, or simply doesn't exist on our menu.
+          The page you are looking for is either under construction, moved to a new location, or simply doesn&rsquo;t exist on our menu.
         </p>
       </div>
 

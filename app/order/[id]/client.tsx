@@ -8,7 +8,6 @@ import { Card } from "../../../components/ui/card";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { ChevronLeft, Phone } from "lucide-react";
 import Link from "next/link";
-import { useAuth } from "../../../lib/store";
 import type { Order, OrderItem, OrderStatusType } from "../../../shared/schema";
 
 // 1. Dynamically import DeliveryMap with SSR disabled
@@ -32,8 +31,6 @@ interface OrderDetail extends Order {
 }
 
 export default function OrderClient({ id }: { id: string }) {
-  const { user } = useAuth();
-
   // 3. Pass the 'OrderDetail' generic to useQuery
   const { data: order, isLoading } = useQuery<OrderDetail>({
     queryKey: ["/api/orders", id],

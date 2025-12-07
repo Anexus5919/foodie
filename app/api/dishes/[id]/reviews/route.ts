@@ -3,21 +3,23 @@ import { storage } from "../../../../../lib/storage";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const reviews = await storage.getDishReviews(params.id);
+  const { id } = await params;
+  const reviews = await storage.getDishReviews(id);
   return NextResponse.json(reviews);
 }
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const review = await storage.createDishReview({
       ...body,
-      dishId: params.id,
+      dishId: id,
     });
     return NextResponse.json(review);
   } catch (error) {

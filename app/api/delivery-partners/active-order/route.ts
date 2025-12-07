@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { storage } from "../../../lib/storage";
 
-export async function GET(request: Request) {
+export async function GET() {
   // Logic from original file: In production, would query by deliveryPartnerId
   return NextResponse.json(null);
 }

@@ -64,7 +64,7 @@ export function HeroSection() {
         <div className="max-w-2xl pt-24">
           {/* Main Heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight tracking-tight">
-            Hungry? We've got <br />
+            Hungry? We&rsquo;ve got <br />
             <span className="text-orange-500">you covered</span>
           </h1>
 

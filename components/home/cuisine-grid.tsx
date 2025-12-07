@@ -52,7 +52,7 @@ export function CuisineGrid() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold">What's on your mind?</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">What&rsquo;s on your mind?</h2>
             <p className="text-muted-foreground mt-1">Explore cuisines you love</p>
           </div>
         </div>

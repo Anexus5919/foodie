@@ -34,7 +34,6 @@ interface RatingData {
   photos: string[];
 }
 
-const ratingEmojis = ["", "", "", "", "", "", "", "", "", "", ""];
 const ratingLabels = [
   "",
   "Terrible",
@@ -104,7 +103,7 @@ export function RatingModal({
         description: "Thank you for your feedback",
       });
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast({
         title: "Failed to submit",
         description: "Please try again later",

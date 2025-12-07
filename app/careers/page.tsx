@@ -21,7 +21,7 @@ export default function CareersPage() {
         </div>
         <h3 className="text-2xl font-semibold mb-2">No Openings Currently</h3>
         <p className="text-muted-foreground mb-6 text-center max-w-md">
-          We don't have any active listings at the moment, but we are always looking for great talent.
+          We don&rsquo;t have any active listings at the moment, but we are always looking for great talent.
         </p>
         
         <Button onClick={handleDropCV} className="gap-2">

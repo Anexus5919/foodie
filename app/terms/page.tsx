@@ -10,7 +10,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold mb-4">1. Introduction</h2>
             <p className="text-muted-foreground">
-              Welcome to <strong>Foodie</strong> ("Company", "we", "our", "us"). These Terms and Conditions ("Terms", "Terms and Conditions") govern your use of our website and mobile application (collectively, the "Service") operated by Foodie. By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.
+              Welcome to <strong>Foodie</strong> (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, &ldquo;us&rdquo;). These Terms and Conditions (&ldquo;Terms&rdquo;, &ldquo;Terms and Conditions&rdquo;) govern your use of our website and mobile application (collectively, the &ldquo;Service&rdquo;) operated by Foodie. By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.
             </p>
           </section>
   
@@ -78,7 +78,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold mb-4">9. Changes to Terms</h2>
             <p className="text-muted-foreground">
-              We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, We will make reasonable efforts to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.
+              We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, We will make reasonable efforts to provide at least 30 days&rsquo; notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.
             </p>
           </section>
   

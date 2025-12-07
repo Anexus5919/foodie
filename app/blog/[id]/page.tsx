@@ -20,7 +20,7 @@ const blogContent: Record<string, { title: string; category: string; date: strin
         <h3>1. Benne Masala Dosa</h3>
         <p>No trip to Bangalore is complete without visiting CTR or Vidyarthi Bhavan. The crispy, butter-laden dosas are a breakfast staple that you simply cannot miss.</p>
         <h3>2. Idli Vada Dip</h3>
-        <p>Soft fluffy idlis and crispy vadas dipped in a bowl of hot, flavorful sambar. It's the ultimate comfort food for any Bangalorean.</p>
+        <p>Soft fluffy idlis and crispy vadas dipped in a bowl of hot, flavorful sambar. It&rsquo;s the ultimate comfort food for any Bangalorean.</p>
         <h3>3. Mangalorean Fish Curry</h3>
         <p>With its proximity to the coast, Bangalore hosts some amazing seafood restaurants. Try the Kane Rava Fry or the spicy Fish Curry with Neer Dosa.</p>
         <p><em>(This is a sample article for demonstration purposes.)</em></p>
@@ -35,9 +35,9 @@ const blogContent: Record<string, { title: string; category: string; date: strin
     readTime: "8 min read",
     content: (
       <>
-        <p>Biryani is more than just a dish; it's an emotion. Originating from Persia and perfected in the royal kitchens of the Mughals, Biryani has traveled a long way to become India's favorite dish.</p>
+        <p>Biryani is more than just a dish; it&rsquo;s an emotion. Originating from Persia and perfected in the royal kitchens of the Mughals, Biryani has traveled a long way to become India&rsquo;s favorite dish.</p>
         <h3>The Origins</h3>
-        <p>The word 'Biryani' comes from the Persian word 'Birian', which means 'fried before cooking'. It was originally a dish for the army, providing a balanced meal of rice, meat, and spices.</p>
+        <p>The word &lsquo;Biryani&rsquo; comes from the Persian word &lsquo;Birian&rsquo;, which means &lsquo;fried before cooking&rsquo;. It was originally a dish for the army, providing a balanced meal of rice, meat, and spices.</p>
         <h3>Regional Varieties</h3>
         <p>From the spicy Hyderabadi Dum Biryani to the aromatic Lucknowi version, and the potato-loving Kolkata Biryani, every region in India has added its own twist to this classic.</p>
       </>
@@ -51,7 +51,7 @@ const blogContent: Record<string, { title: string; category: string; date: strin
     readTime: "4 min read",
     content: (
       <>
-        <p>Eating healthy doesn't mean burning a hole in your pocket. With a little planning and smart choices, you can maintain a nutritious diet on a budget.</p>
+        <p>Eating healthy doesn&rsquo;t mean burning a hole in your pocket. With a little planning and smart choices, you can maintain a nutritious diet on a budget.</p>
         <h3>1. Buy Seasonal</h3>
         <p>Seasonal fruits and vegetables are not only fresher and tastier but also significantly cheaper than off-season produce.</p>
         <h3>2. Cook at Home</h3>

@@ -201,7 +201,7 @@ export default function CheckoutClient() {
                   selectedId={selectedAddressId}
                   onSelect={setSelectedAddressId}
                   onAddAddress={async (addr) => {
-                    await addAddressMutation.mutateAsync(addr as any);
+                    await addAddressMutation.mutateAsync(addr as typeof addr);
                   }}
                 />
               </CardContent>

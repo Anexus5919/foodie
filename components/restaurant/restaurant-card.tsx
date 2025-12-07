@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardFooter, CardHeader } from "../../components/ui/card";
+import { Card, CardContent, CardFooter } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
 import type { Restaurant } from "../../shared/schema";
 import { Star, Clock, MapPin, Heart } from "lucide-react";
-import { cn } from "../../lib/utils";
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
