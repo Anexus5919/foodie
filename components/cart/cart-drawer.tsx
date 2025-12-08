@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link"; // FIXED: Use Next.js Link
+import Link from "next/link";
 import {
   Sheet,
   SheetContent,
@@ -25,6 +25,7 @@ import {
   Store,
   Clock,
   Percent,
+  Package 
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -94,7 +95,16 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="w-full sm:max-w-lg">
           <SheetHeader>
-            <SheetTitle>Your Cart</SheetTitle>
+            <div className="flex items-center justify-between">
+              <SheetTitle>Your Cart</SheetTitle>
+              {/* My Orders Button in Empty State */}
+              <Button variant="outline" size="sm" asChild onClick={() => onOpenChange(false)}>
+                <Link href="/orders">
+                  <Package className="h-4 w-4 mr-1" />
+                  My Orders
+                </Link>
+              </Button>
+            </div>
           </SheetHeader>
           
           <div className="flex flex-col items-center justify-center h-[70vh] text-center">
@@ -120,16 +130,25 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center justify-between gap-4">
             <span>Your Cart ({itemCount} items)</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearCart}
-              className="text-destructive hover:text-destructive"
-              data-testid="button-clear-cart"
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Clear
-            </Button>
+             <div className="flex gap-2">
+                {/* MY ORDERS BUTTON */}
+                <Button variant="outline" size="sm" asChild onClick={() => onOpenChange(false)}>
+                  <Link href="/orders">
+                    <Package className="h-4 w-4 mr-1" />
+                    My Orders
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearCart}
+                  className="text-destructive hover:text-destructive"
+                  data-testid="button-clear-cart"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Clear
+                </Button>
+             </div>
           </SheetTitle>
         </SheetHeader>
 

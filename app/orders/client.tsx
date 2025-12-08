@@ -42,16 +42,17 @@ export default function OrdersClient() {
     }
   }, [isAuthenticated, authLoading, router]);
 
-// Fetch Orders with polling
-const { data: orders = [], isLoading } = useQuery<OrderWithDetails[]>({
+  // Fetch Orders with polling
+  const { data: orders = [], isLoading } = useQuery<OrderWithDetails[]>({
     queryKey: ["/api/orders", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       const res = await apiRequest("GET", `/api/orders?userId=${user?.id}`);
       return res.json();
     },
-    refetchInterval: 5000, // Poll list every 5 seconds
+    refetchInterval: 5000,
   });
+
   // Cancel Order Mutation
   const cancelOrderMutation = useMutation({
     mutationFn: async (orderId: string) => {
@@ -66,6 +67,17 @@ const { data: orders = [], isLoading } = useQuery<OrderWithDetails[]>({
     },
     onError: () => {
       toast({ title: "Failed to cancel order", variant: "destructive" });
+    },
+  });
+
+  // Delete Order Mutation
+  const deleteOrderMutation = useMutation({
+    mutationFn: async (orderId: string) => {
+      await apiRequest("DELETE", `/api/orders/${orderId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      toast({ title: "Order log deleted" });
     },
   });
 
@@ -117,7 +129,11 @@ const { data: orders = [], isLoading } = useQuery<OrderWithDetails[]>({
             <EmptyState message="No past orders" />
           ) : (
             deliveredOrders.map((order) => (
-              <OrderCard key={order.id} order={order} />
+              <OrderCard 
+                key={order.id} 
+                order={order} 
+                onDelete={() => deleteOrderMutation.mutate(order.id)}
+              />
             ))
           )}
         </TabsContent>
@@ -128,7 +144,11 @@ const { data: orders = [], isLoading } = useQuery<OrderWithDetails[]>({
             <EmptyState message="No cancelled orders" />
           ) : (
             cancelledOrders.map((order) => (
-              <OrderCard key={order.id} order={order} />
+              <OrderCard 
+                key={order.id} 
+                order={order} 
+                onDelete={() => deleteOrderMutation.mutate(order.id)}
+              />
             ))
           )}
         </TabsContent>

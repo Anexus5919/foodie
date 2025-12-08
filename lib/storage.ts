@@ -51,6 +51,7 @@ export interface IStorage {
   getAvailableOrdersForDelivery(): Promise<Order[]>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrder(id: string, data: Partial<Order>): Promise<Order | undefined>;
+  deleteOrder(id: string): Promise<void>;
 
   // Addresses
   getAddresses(userId: string): Promise<Address[]>;
@@ -70,6 +71,7 @@ export interface IStorage {
   // Reviews
   createDishReview(review: InsertDishReview): Promise<DishReview>;
   getDishReviews(dishId: string): Promise<DishReview[]>;
+  getReviewsByRestaurant(restaurantId: string): Promise<DishReview[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -89,24 +91,21 @@ export class MemStorage implements IStorage {
 
   // --- REAL-TIME SIMULATION ENGINE ---
   private simulateOrderProgress(order: Order): Order {
-    // Only simulate active orders
     if (["delivered", "cancelled"].includes(order.status)) return order;
 
     const now = new Date();
     const createdAt = new Date(order.createdAt || now);
     const elapsedSeconds = (now.getTime() - createdAt.getTime()) / 1000;
 
-    // Simulation Timeline (in seconds)
     const TIME_TO_ACCEPT = 10;
     const TIME_TO_PREPARE = 25;
     const TIME_TO_READY = 45;
     const TIME_TO_PICKUP = 60;
-    const TIME_TO_DELIVER = 120; // 2 minutes total for demo purposes
+    const TIME_TO_DELIVER = 120; 
 
     const updated = { ...order };
     let changed = false;
 
-    // 1. Advance Status
     if (elapsedSeconds > TIME_TO_ACCEPT && order.status === "pending") {
       updated.status = "accepted";
       updated.acceptedAt = now;
@@ -122,7 +121,7 @@ export class MemStorage implements IStorage {
     } else if (elapsedSeconds > TIME_TO_PICKUP && order.status === "ready") {
       updated.status = "picked_up";
       updated.pickedUpAt = now;
-      updated.deliveryPartnerId = "simulated-driver-1"; // Assign fake driver
+      updated.deliveryPartnerId = "simulated-driver-1";
       changed = true;
     } else if (elapsedSeconds > TIME_TO_DELIVER && order.status === "picked_up") {
       updated.status = "delivered";
@@ -130,11 +129,8 @@ export class MemStorage implements IStorage {
       changed = true;
     }
 
-    // 2. Simulate Driver Movement (Interpolation)
     if (updated.status === "picked_up") {
-      // Get Restaurant Location
       const restaurant = this.restaurants.get(order.restaurantId);
-      // Get User Address Location
       const address = order.addressId ? this.addresses.get(order.addressId) : null;
 
       if (restaurant && address && restaurant.latitude && restaurant.longitude && address.latitude && address.longitude) {
@@ -143,16 +139,12 @@ export class MemStorage implements IStorage {
         const endLat = Number(address.latitude);
         const endLng = Number(address.longitude);
 
-        // Calculate progress (0.0 to 1.0) between Pickup and Delivery time
         const totalTravelTime = TIME_TO_DELIVER - TIME_TO_PICKUP;
         const currentTravelTime = elapsedSeconds - TIME_TO_PICKUP;
         const progress = Math.min(Math.max(currentTravelTime / totalTravelTime, 0), 1);
 
-        // Linear Interpolation (Lerp)
         const currentLat = startLat + (endLat - startLat) * progress;
         const currentLng = startLng + (endLng - startLng) * progress;
-
-        // Add some "jitter" to make it look organic (not a perfectly straight line)
         const jitter = (Math.random() - 0.5) * 0.0005; 
         
         updated.deliveryPartnerLocation = {
@@ -163,7 +155,6 @@ export class MemStorage implements IStorage {
       }
     }
 
-    // 3. Update Estimated Time
     const remainingSeconds = Math.max(0, TIME_TO_DELIVER - elapsedSeconds);
     updated.estimatedDeliveryTime = Math.ceil(remainingSeconds / 60);
 
@@ -714,32 +705,57 @@ async getDishes(restaurantId: string) { return Array.from(this.dishes.values()).
 async getDish(id: string) { return this.dishes.get(id); }
 async createDish(dish: InsertDish) { const id = randomUUID(); const newDish = { ...dish, id } as Dish; this.dishes.set(id, newDish); return newDish; }
 async updateDish(id: string, data: Partial<Dish>) { const d = this.dishes.get(id); if (!d) return undefined; const updated = { ...d, ...data }; this.dishes.set(id, updated); return updated; }
+
 async getOrders(userId: string) { 
-  // Simulate progress for ALL user orders when fetched
   const userOrders = Array.from(this.orders.values()).filter((o) => o.userId === userId);
   return userOrders.map(o => this.simulateOrderProgress(o)).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 }
 async getOrder(id: string) { 
   const order = this.orders.get(id); 
   if (!order) return undefined;
-  // Simulate progress on fetch
   return this.simulateOrderProgress(order);
 }
 async getOrdersByRestaurant(restaurantId: string) { return Array.from(this.orders.values()).filter((o) => o.restaurantId === restaurantId).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()); }
 async getAvailableOrdersForDelivery() { return Array.from(this.orders.values()).filter((o) => o.status === "ready" && !o.deliveryPartnerId); }
 async createOrder(order: InsertOrder) { const id = randomUUID(); const newOrder = { ...order, id, createdAt: new Date() } as Order; this.orders.set(id, newOrder); return newOrder; }
 async updateOrder(id: string, data: Partial<Order>) { const o = this.orders.get(id); if (!o) return undefined; const updated = { ...o, ...data }; if (data.status) { if (data.status === 'accepted') updated.acceptedAt = new Date(); if (data.status === 'preparing') updated.preparingAt = new Date(); if (data.status === 'ready') updated.readyAt = new Date(); if (data.status === 'picked_up') updated.pickedUpAt = new Date(); if (data.status === 'delivered') updated.deliveredAt = new Date(); } this.orders.set(id, updated); return updated; }
+async deleteOrder(id: string) { this.orders.delete(id); }
+
 async getAddresses(userId: string) { return Array.from(this.addresses.values()).filter((a) => a.userId === userId); }
 async getAddress(id: string) { return this.addresses.get(id); }
 async createAddress(address: InsertAddress) { const id = randomUUID(); const newAddr = { ...address, id } as Address; this.addresses.set(id, newAddr); return newAddr; }
 async deleteAddress(id: string) { this.addresses.delete(id); }
+
 async getDeliveryPartner(userId: string) { return Array.from(this.deliveryPartners.values()).find((p) => p.userId === userId); }
 async createDeliveryPartner(partner: InsertDeliveryPartner) { const id = randomUUID(); const newP = { ...partner, id } as DeliveryPartner; this.deliveryPartners.set(id, newP); return newP; }
 async updateDeliveryPartner(userId: string, data: Partial<DeliveryPartner>) { const p = await this.getDeliveryPartner(userId); if (!p) return undefined; const updated = { ...p, ...data }; this.deliveryPartners.set(p.id, updated); return updated; }
+
 async getCoupon(code: string) { return this.coupons.get(code.toUpperCase()); }
 async validateCoupon(code: string, amount: number, restaurantId?: string) { const c = await this.getCoupon(code); if (!c || !c.isActive) return null; if (c.minOrderAmount && amount < Number(c.minOrderAmount)) return null; if (c.restaurantId && c.restaurantId !== restaurantId) return null; if (c.usageLimit && c.usedCount && c.usedCount >= c.usageLimit) return null; if (c.validUntil && new Date() > new Date(c.validUntil)) return null; return c; }
-async createDishReview(review: InsertDishReview) { const id = randomUUID(); const newReview = { ...review, id, createdAt: new Date() } as DishReview; this.dishReviews.set(id, newReview); return newReview; }
-async getDishReviews(dishId: string) { return Array.from(this.dishReviews.values()).filter((r) => r.dishId === dishId).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()); }
+
+// --- REVIEWS ---
+async createDishReview(review: InsertDishReview) { 
+    const id = randomUUID(); 
+    const newReview = { ...review, id, createdAt: new Date() } as DishReview; 
+    this.dishReviews.set(id, newReview); 
+    return newReview; 
+}
+
+async getDishReviews(dishId: string) { 
+    return Array.from(this.dishReviews.values())
+      .filter((r) => r.dishId === dishId)
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()); 
+}
+
+// FIXED: Filters reviews by restaurant ID via its dishes
+async getReviewsByRestaurant(restaurantId: string) {
+    const dishes = await this.getDishes(restaurantId);
+    const dishIds = dishes.map(d => d.id);
+    
+    return Array.from(this.dishReviews.values())
+      .filter((r) => dishIds.includes(r.dishId))
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+}
 }
 
 const globalForStorage = globalThis as unknown as { storage: MemStorage };

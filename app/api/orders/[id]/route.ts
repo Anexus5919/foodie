@@ -47,7 +47,6 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // FIX: Await params to get the ID correctly
   const { id } = await params;
   
   const body = await request.json();
@@ -57,4 +56,14 @@ export async function PATCH(
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
   return NextResponse.json(updated);
+}
+
+// Added DELETE method
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  await storage.deleteOrder(id);
+  return NextResponse.json({ success: true });
 }

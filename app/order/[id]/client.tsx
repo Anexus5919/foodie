@@ -1,17 +1,15 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import dynamic from "next/dynamic"; // Import dynamic for lazy loading
+import dynamic from "next/dynamic";
 import { OrderTimeline } from "../../../components/order/order-timeline";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { ChevronLeft, Phone } from "lucide-react";
+import { ChevronLeft, Phone, Home } from "lucide-react";
 import Link from "next/link";
 import type { Order, OrderItem, OrderStatusType } from "../../../shared/schema";
 
-// 1. Dynamically import DeliveryMap with SSR disabled
-// This prevents 'ReferenceError: location is not defined' during server rendering
 const DeliveryMap = dynamic(
   () => import("../../../components/map/delivery-map").then((mod) => mod.DeliveryMap),
   { 
@@ -20,7 +18,6 @@ const DeliveryMap = dynamic(
   }
 );
 
-// 2. Define the exact shape of the API response to fix TS errors
 interface OrderDetail extends Order {
   restaurant?: {
     name: string;
@@ -31,7 +28,6 @@ interface OrderDetail extends Order {
 }
 
 export default function OrderClient({ id }: { id: string }) {
-  // 3. Pass the 'OrderDetail' generic to useQuery
   const { data: order, isLoading } = useQuery<OrderDetail>({
     queryKey: ["/api/orders", id],
     refetchInterval: 2000,
@@ -50,13 +46,12 @@ export default function OrderClient({ id }: { id: string }) {
     return <div className="p-8 text-center">Order not found</div>;
   }
 
-  // Helper to safely access properties
   const items = (order.items || []) as OrderItem[];
   const status = order.status as OrderStatusType;
+  const isDelivered = status === "delivered";
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b px-4 py-3 flex items-center gap-4">
         <Link href="/orders">
           <Button variant="ghost" size="icon">
@@ -73,10 +68,8 @@ export default function OrderClient({ id }: { id: string }) {
 
       <div className="container mx-auto p-4 grid gap-6 lg:grid-cols-3">
         
-        {/* Left Column: Map */}
         <div className="lg:col-span-2 space-y-4">
           <Card className="overflow-hidden border-0 shadow-lg h-[60vh] lg:h-[70vh] relative rounded-xl">
-            {/* The Map component is now client-only */}
             <DeliveryMap
               className="w-full h-full"
               restaurantLocation={order.restaurant?.location}
@@ -84,23 +77,38 @@ export default function OrderClient({ id }: { id: string }) {
               partnerLocation={order.deliveryPartnerLocation || undefined}
             />
             
-            {/* Overlay Status Card */}
             <div className="absolute bottom-4 left-4 right-4 bg-background/90 backdrop-blur p-4 rounded-lg shadow-lg border">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="font-semibold text-lg">
-                    {status === 'delivered' ? 'Arrived' : 
-                     status === 'picked_up' ? 'On the way' : 
-                     'Preparing your food'}
+                  <p className="font-semibold text-lg flex items-center gap-2">
+                    {isDelivered ? (
+                      <>
+                        <Home className="h-5 w-5 text-green-600" />
+                        Delivered
+                      </>
+                    ) : status === 'picked_up' ? (
+                      'On the way'
+                    ) : (
+                      'Preparing your food'
+                    )}
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {order.estimatedDeliveryTime 
-                      ? `Arriving in ${order.estimatedDeliveryTime} mins` 
-                      : "Calculating time..."}
-                  </p>
+                  {!isDelivered && (
+                    <p className="text-sm text-muted-foreground">
+                      {order.estimatedDeliveryTime 
+                        ? `Arriving in ${order.estimatedDeliveryTime} mins` 
+                        : "Calculating time..."}
+                    </p>
+                  )}
+                  {isDelivered && (
+                     <p className="text-sm text-muted-foreground">Order completed</p>
+                  )}
                 </div>
-                {order.deliveryPartnerId && (
-                  <Button size="icon" className="rounded-full bg-green-600 hover:bg-green-700">
+                {order.deliveryPartnerId && !isDelivered && (
+                  <Button 
+                    size="icon" 
+                    className="rounded-full bg-green-600 hover:bg-green-700"
+                    onClick={() => window.open(`tel:+919876543210`)} 
+                  >
                     <Phone className="h-4 w-4 text-white" />
                   </Button>
                 )}
@@ -109,7 +117,6 @@ export default function OrderClient({ id }: { id: string }) {
           </Card>
         </div>
 
-        {/* Right Column: Timeline & Details */}
         <div className="space-y-6">
           <Card className="p-6">
             <h3 className="font-semibold mb-4">Order Status</h3>
