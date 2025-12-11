@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       menuContext += `=== Restaurant: ${restaurant.name} ===\n`;
       menuContext += `Cuisines: ${restaurant.cuisines.join(", ")}\n`;
       menuContext += `Menu:\n`;
-      
+      // This is a comment.
       for (const dish of dishes) {
         menuContext += `- Dish: ${dish.name} | Price: ₹${dish.price}\n`;
         menuContext += `  Desc: ${dish.description}\n`;
