@@ -18,6 +18,8 @@ import {
   type InsertDishReview,
 } from "../shared/schema";
 import { randomUUID } from "crypto";
+import fs from "fs";
+import path from "path";
 
 export interface IStorage {
   // Users
@@ -85,8 +87,36 @@ export class MemStorage implements IStorage {
   private coupons: Map<string, Coupon> = new Map();
   private dishReviews: Map<string, DishReview> = new Map();
 
+  // Persistence file path
+  private REVIEWS_FILE = path.join(process.cwd(), "reviews.json");
+
   constructor() {
     this.seedData();
+    this.loadReviews();
+  }
+
+  // --- PERSISTENCE HELPERS ---
+  private loadReviews() {
+    try {
+      if (fs.existsSync(this.REVIEWS_FILE)) {
+        const data = fs.readFileSync(this.REVIEWS_FILE, "utf-8");
+        const reviewsArray = JSON.parse(data);
+        // Re-hydrate the Map from the array of entries
+        this.dishReviews = new Map(reviewsArray);
+      }
+    } catch (error) {
+      console.warn("Failed to load reviews from persistence file:", error);
+    }
+  }
+
+  private saveReviews() {
+    try {
+      // Convert Map to array of entries for JSON serialization
+      const data = JSON.stringify(Array.from(this.dishReviews.entries()));
+      fs.writeFileSync(this.REVIEWS_FILE, data);
+    } catch (error) {
+      console.warn("Failed to save reviews to persistence file:", error);
+    }
   }
 
   // --- REAL-TIME SIMULATION ENGINE ---
@@ -738,6 +768,7 @@ async createDishReview(review: InsertDishReview) {
     const id = randomUUID(); 
     const newReview = { ...review, id, createdAt: new Date() } as DishReview; 
     this.dishReviews.set(id, newReview); 
+    this.saveReviews(); // PERSIST TO FILE
     return newReview; 
 }
 
