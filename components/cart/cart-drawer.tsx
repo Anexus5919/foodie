@@ -160,7 +160,8 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
               <p className="font-medium truncate">{cart.restaurant.name}</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                {cart.restaurant.deliveryTime} mins delivery
+                {/* Hardcoded to 2 mins as requested */}
+                2 mins delivery
               </p>
             </div>
           </div>
