@@ -17,6 +17,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItemWithDetails[]>([]);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  // Global discount state
+  const [discount, setDiscount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+
+  const applyCoupon = useCallback((code: string, amount: number) => {
+    setAppliedCoupon(code);
+    setDiscount(amount);
+  }, []);
+
+  const removeCoupon = useCallback(() => {
+    setAppliedCoupon(null);
+    setDiscount(0);
+  }, []);
 
   const addItem = useCallback((item: CartItemWithDetails) => {
     setItems((prev) => {
@@ -25,6 +38,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Clear cart and add new item
         setRestaurantId(item.restaurantId);
         setRestaurant(item.restaurant || null);
+        // Reset coupon when restaurant changes
+        setDiscount(0);
+        setAppliedCoupon(null);
         return [item];
       }
       
@@ -63,6 +79,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (filtered.length === 0) {
         setRestaurantId(null);
         setRestaurant(null);
+        // Reset coupon if cart becomes empty
+        setDiscount(0);
+        setAppliedCoupon(null);
       }
       return filtered;
     });
@@ -90,35 +109,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([]);
     setRestaurantId(null);
     setRestaurant(null);
+    setDiscount(0);
+    setAppliedCoupon(null);
   }, []);
 
   const getTotal = useCallback(() => {
     const subtotal = items.reduce((sum, item) => sum + Number(item.totalPrice), 0);
     
-    // UPDATED LOGIC: Delivery fee constraints
-    // If subtotal is 0 (empty cart), fee is 0.
-    // If subtotal is > 0 but < 150, fee is 50.
-    // If subtotal is >= 150, fee is 0 (Free).
+    // Delivery fee constraints
     let deliveryFee = 0;
     if (subtotal > 0) {
       deliveryFee = subtotal < 150 ? 50 : 0;
     }
 
     const taxes = subtotal * 0.05; // 5% GST
-    const total = subtotal + deliveryFee + taxes;
-    return { subtotal, deliveryFee, taxes, total };
-  }, [items]);
+    
+    // Ensure discount doesn't exceed payable amount (excluding delivery fee usually, but simplicity here)
+    const validDiscount = Math.min(discount, subtotal + taxes);
+    
+    const total = Math.max(0, subtotal + deliveryFee + taxes - validDiscount);
+    
+    return { subtotal, deliveryFee, taxes, discount: validDiscount, total };
+  }, [items, discount]);
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <CartContext.Provider
       value={{
-        cart: { items, restaurantId, restaurant },
+        cart: { items, restaurantId, restaurant, discount, appliedCoupon },
         addItem,
         removeItem,
         updateQuantity,
         clearCart,
+        applyCoupon,
+        removeCoupon,
         getTotal,
         itemCount,
       }}

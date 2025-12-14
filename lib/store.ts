@@ -8,6 +8,8 @@ interface CartState {
   items: CartItemWithDetails[];
   restaurantId: string | null;
   restaurant: Restaurant | null;
+  discount: number; // NEW
+  appliedCoupon: string | null; // NEW
 }
 
 interface CartContextType {
@@ -16,7 +18,9 @@ interface CartContextType {
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
-  getTotal: () => { subtotal: number; deliveryFee: number; taxes: number; total: number };
+  applyCoupon: (code: string, amount: number) => void; // NEW
+  removeCoupon: () => void; // NEW
+  getTotal: () => { subtotal: number; deliveryFee: number; taxes: number; total: number; discount: number }; // UPDATED
   itemCount: number;
 }
 

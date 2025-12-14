@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { useToast } from "../../../hooks/use-toast";
+import { ToastAction } from "../../../components/ui/toast";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 
 export default function RestaurantClient({ id }: { id: string }) {
@@ -34,6 +36,7 @@ export default function RestaurantClient({ id }: { id: string }) {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   useEffect(() => {
     const favs = JSON.parse(localStorage.getItem("foodie_favorites") || "[]");
@@ -65,7 +68,16 @@ export default function RestaurantClient({ id }: { id: string }) {
 
   const handleDirectReviewSubmit = async () => {
     if (!isAuthenticated) {
-        toast({ title: "Please sign in", description: "You need to be logged in to review.", variant: "destructive" });
+        toast({ 
+          title: "Please sign in", 
+          description: "You need to be logged in to review.", 
+          variant: "destructive",
+          action: (
+            <ToastAction altText="Sign In" onClick={() => router.push("/")}>
+              Sign In
+            </ToastAction>
+          )
+        });
         return;
     }
     if (reviewRating === 0) {

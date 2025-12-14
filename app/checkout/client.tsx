@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Separator } from "../../components/ui/separator";
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { useToast } from "../../hooks/use-toast";
+import { ToastAction } from "../../components/ui/toast";
 import { ArrowLeft, Loader2, ShieldCheck, MapPin } from "lucide-react";
 import { apiRequest } from "../../lib/queryClient";
 import type { Address } from "../../shared/schema";
@@ -42,6 +43,11 @@ export default function CheckoutClient() {
         title: "Please login",
         description: "You need to be logged in to place an order",
         variant: "destructive",
+        action: (
+          <ToastAction altText="Sign In" onClick={() => router.push("/")}>
+            Sign In
+          </ToastAction>
+        ),
       });
       router.push("/");
     }
@@ -129,6 +135,7 @@ export default function CheckoutClient() {
         subtotal: totals.subtotal.toFixed(2),
         deliveryFee: totals.deliveryFee.toFixed(2),
         taxes: totals.taxes.toFixed(2),
+        discount: totals.discount.toFixed(2), // INCLUDE DISCOUNT IN PAYLOAD
         total: totals.total.toFixed(2),
         paymentMethod,
         paymentStatus: "paid", // In a real app, this comes from the gateway
@@ -148,6 +155,11 @@ export default function CheckoutClient() {
       toast({
         title: "Order Placed! 🎉",
         description: "Your food is on the way.",
+        action: (
+          <ToastAction altText="View Orders" onClick={() => router.push("/orders")}>
+            View Orders
+          </ToastAction>
+        ),
       });
       
       router.push(`/order/${newOrder.id}`);
@@ -268,6 +280,15 @@ export default function CheckoutClient() {
                     <span>Taxes (5%)</span>
                     <span>{totals.taxes.toFixed(2)}</span>
                   </div>
+                  
+                  {/* DISPLAY DISCOUNT */}
+                  {cart.discount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                        <span>Discount ({cart.appliedCoupon})</span>
+                        <span>-{cart.discount.toFixed(2)}</span>
+                    </div>
+                  )}
+
                   <Separator className="my-2" />
                   <div className="flex justify-between font-bold text-lg">
                     <span>To Pay</span>
