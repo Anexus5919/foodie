@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Separator } from "../../components/ui/separator";
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { useToast } from "../../hooks/use-toast";
+import { ToastAction } from "../../components/ui/toast";
 import { ArrowLeft, Loader2, ShieldCheck, MapPin } from "lucide-react";
 import { apiRequest } from "../../lib/queryClient";
 import type { Address } from "../../shared/schema";
@@ -42,6 +43,11 @@ export default function CheckoutClient() {
         title: "Please login",
         description: "You need to be logged in to place an order",
         variant: "destructive",
+        action: (
+          <ToastAction altText="Sign In" onClick={() => router.push("/")}>
+            Sign In
+          </ToastAction>
+        ),
       });
       router.push("/");
     }
@@ -148,6 +154,11 @@ export default function CheckoutClient() {
       toast({
         title: "Order Placed! 🎉",
         description: "Your food is on the way.",
+        action: (
+          <ToastAction altText="View Orders" onClick={() => router.push("/orders")}>
+            View Orders
+          </ToastAction>
+        ),
       });
       
       router.push(`/order/${newOrder.id}`);

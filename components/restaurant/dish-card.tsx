@@ -1,4 +1,7 @@
+"use client";
+
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import {
@@ -15,6 +18,7 @@ import { Separator } from "../../components/ui/separator";
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { useCart } from "../../lib/store";
 import { useToast } from "../../hooks/use-toast";
+import { ToastAction } from "../../components/ui/toast";
 import type { Dish, Restaurant, SelectedCustomization, DishCustomization } from "../../shared/schema";
 import { Star, Plus, Minus, Flame, Award, Sparkles, Heart } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -32,6 +36,7 @@ export function DishCard({ dish, restaurant }: DishCardProps) {
   const [specialInstructions, setSpecialInstructions] = useState("");
   const { addItem, cart } = useCart();
   const { toast } = useToast();
+  const router = useRouter();
 
   const customizations = dish.customizations as DishCustomization[] | null;
   const hasCustomizations = customizations && customizations.length > 0;
@@ -85,6 +90,11 @@ export function DishCard({ dish, restaurant }: DishCardProps) {
     toast({
       title: "Added to cart",
       description: `${quantity}x ${dish.name} added`,
+      action: (
+        <ToastAction altText="View Cart" onClick={() => router.push("/checkout")}>
+          View Cart
+        </ToastAction>
+      ),
     });
 
     // Reset state
