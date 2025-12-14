@@ -35,10 +35,8 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
-  const { cart, updateQuantity, clearCart, getTotal, itemCount } = useCart();
+  const { cart, updateQuantity, clearCart, getTotal, itemCount, applyCoupon, removeCoupon } = useCart();
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
-  const [discount, setDiscount] = useState(0);
   const { toast } = useToast();
 
   const totals = getTotal();
@@ -49,16 +47,14 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
     // Demo coupon logic
     if (couponCode.toUpperCase() === "FIRST50") {
       const discountAmount = Math.min(totals.subtotal * 0.5, 100);
-      setDiscount(discountAmount);
-      setAppliedCoupon(couponCode.toUpperCase());
+      applyCoupon(couponCode.toUpperCase(), discountAmount);
       toast({
         title: "Coupon applied!",
         description: `You saved ${discountAmount.toFixed(2)}`,
       });
     } else if (couponCode.toUpperCase() === "FLAT100") {
       if (totals.subtotal >= 300) {
-        setDiscount(100);
-        setAppliedCoupon(couponCode.toUpperCase());
+        applyCoupon(couponCode.toUpperCase(), 100);
         toast({
           title: "Coupon applied!",
           description: "You saved 100",
@@ -80,15 +76,12 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
     setCouponCode("");
   };
 
-  const removeCoupon = () => {
-    setAppliedCoupon(null);
-    setDiscount(0);
+  const handleRemoveCoupon = () => {
+    removeCoupon();
     toast({
       title: "Coupon removed",
     });
   };
-
-  const finalTotal = totals.total - discount;
 
   if (cart.items.length === 0) {
     return (
@@ -252,19 +245,19 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
               <span className="font-medium text-sm">Apply Coupon</span>
             </div>
 
-            {appliedCoupon ? (
+            {cart.appliedCoupon ? (
               <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
                 <div className="flex items-center gap-2">
                   <Percent className="h-4 w-4 text-green-600" />
                   <div>
-                    <p className="font-medium text-sm text-green-600">{appliedCoupon}</p>
-                    <p className="text-xs text-green-600/80">You saved {discount.toFixed(2)}</p>
+                    <p className="font-medium text-sm text-green-600">{cart.appliedCoupon}</p>
+                    <p className="text-xs text-green-600/80">You saved {cart.discount.toFixed(2)}</p>
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={removeCoupon}
+                  onClick={handleRemoveCoupon}
                   className="text-red-600 hover:text-red-700"
                   data-testid="button-remove-coupon"
                 >
@@ -325,10 +318,10 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             <span>{totals.taxes.toFixed(2)}</span>
           </div>
 
-          {discount > 0 && (
+          {cart.discount > 0 && (
             <div className="flex justify-between text-sm text-green-600">
               <span>Discount</span>
-              <span>-{discount.toFixed(2)}</span>
+              <span>-{cart.discount.toFixed(2)}</span>
             </div>
           )}
 
@@ -336,7 +329,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
           
           <div className="flex justify-between font-semibold">
             <span>To Pay</span>
-            <span>{finalTotal.toFixed(2)}</span>
+            <span>{totals.total.toFixed(2)}</span>
           </div>
         </div>
 

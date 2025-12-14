@@ -135,6 +135,7 @@ export default function CheckoutClient() {
         subtotal: totals.subtotal.toFixed(2),
         deliveryFee: totals.deliveryFee.toFixed(2),
         taxes: totals.taxes.toFixed(2),
+        discount: totals.discount.toFixed(2), // INCLUDE DISCOUNT IN PAYLOAD
         total: totals.total.toFixed(2),
         paymentMethod,
         paymentStatus: "paid", // In a real app, this comes from the gateway
@@ -279,6 +280,15 @@ export default function CheckoutClient() {
                     <span>Taxes (5%)</span>
                     <span>{totals.taxes.toFixed(2)}</span>
                   </div>
+                  
+                  {/* DISPLAY DISCOUNT */}
+                  {cart.discount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                        <span>Discount ({cart.appliedCoupon})</span>
+                        <span>-{cart.discount.toFixed(2)}</span>
+                    </div>
+                  )}
+
                   <Separator className="my-2" />
                   <div className="flex justify-between font-bold text-lg">
                     <span>To Pay</span>
