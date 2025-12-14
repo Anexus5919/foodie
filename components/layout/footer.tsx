@@ -34,18 +34,43 @@ export function Footer() {
     }
 
     setIsLoading(true);
-    
-    // Simulate network delay for "sending" email
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsLoading(false);
-    setEmail("");
-    
-    toast({
-      title: "Subscribed Successfully!",
-      description: `A confirmation mail has been sent to ${email}`,
-      action: <div className="h-8 w-8 bg-green-500 rounded-full flex items-center justify-center"><CheckCircle2 className="h-5 w-5 text-white" /></div>
-    });
+
+    try {
+      console.log("🚀 Sending subscription request for:", email);
+      
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      console.log("📥 Response status:", response.status);
+      
+      const data = await response.json();
+      console.log("📦 Response data:", data);
+
+      // Check if the response indicates success
+      if (!response.ok || data.success === false) {
+        throw new Error(data.error || data.details || "Failed to subscribe");
+      }
+      
+      toast({
+        title: "Subscribed Successfully!",
+        description: `A confirmation mail has been sent to ${email}`,
+        action: <div className="h-8 w-8 bg-green-500 rounded-full flex items-center justify-center"><CheckCircle2 className="h-5 w-5 text-white" /></div>
+      });
+      setEmail("");
+      
+    } catch (error: any) {
+      console.error("❌ Subscription error:", error);
+      toast({
+        title: "Subscription Failed",
+        description: error.message || "Could not subscribe at this time. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
